@@ -1,0 +1,57 @@
+#!/sbin/openrc-run
+
+checkconfig()
+{
+  if [ ! -f /etc/conf.d/trimd ] ; then
+    eerror "/etc/conf.d/trimd does not exists."
+    return 1
+  fi
+
+  if [ -z "${DAEMON}" ] \
+  	|| [ -z "${PID}" ] \
+  	|| [ -z "${IONICE}" ] \
+  	|| [ -z "${MAX_LA}" ] \
+  	|| [ -z "${NICE}" ] \
+  	|| [ -z "${SLEEP_CHUNK}" ] \
+  	|| [ -z "${SLEEP_AT_START}" ] \
+  	|| [ -z "${SLEEP_BEFORE_REPEAT}" ]
+  then
+    eerror "You must set config options in /etc/conf.d/trimd first"
+    return 1
+  fi
+
+  if [ ! -f ${DAEMON} ] ; then
+    eerror "Script ${DAEMON} does not exists."
+    return 1
+  fi
+
+  if [ -z "${LOG}" ]; then
+    LOGOPT=( --stdout-logger '/usr/bin/logger --tag trimd' )
+  else
+    LOGOPT=( --stdout ${LOG} )
+  fi
+}
+
+start()
+{
+  ebegin "Starting trimd"
+  checkconfig || return 1
+  start-stop-daemon --start \
+    --exec ${DAEMON} \
+    --pidfile ${PID} \
+    --background \
+    --make-pidfile \
+    --ionice ${IONICE} \
+    --nice ${NICE} \
+    "${LOGOPT[@]}"
+  eend $?
+}
+
+stop()
+{
+  ebegin "Stopping trimd"
+  start-stop-daemon --stop \
+    --exec ${DAEMON} \
+    --pidfile ${PID}
+  eend $retval
+}
