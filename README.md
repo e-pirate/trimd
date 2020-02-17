@@ -1,7 +1,7 @@
 trimd
 ===========
 
-Lightweight but versatile and powerful daemon the trims SSD on a regular basis.
+Lightweight but versatile and powerful daemon that trims SSD on a regular basis.
 
 
 MOTIVATION
@@ -46,58 +46,60 @@ systemctl enable trimd
 If you are using systemd, uninstall.sh will stop and disable the daemon
 
 Files which are not removed during uninstallation:
-- _/etc/conf.d/fstrimDaemon_
-- _/var/log/fstrimDaemon.log_
+- /etc/conf.d/trimd
 
 
 CONFIGURATION
 -----------------------------------------
 
 
-Default config file: _/etc/conf.d/fstrimDaemon_
+Default config file: /etc/conf.d/trimd
 
 ```bash
-# Time to wait after daemon start to perform first fstrim
-# e.g. "30m" - 30 minutes. See man sleep.
+# Time after daemon start before first trim will be performed
+# Default is 2h. For other possible values check sleep manual
 SLEEP_AT_START="2h"
 
-# Time to sleep between next repetition of fstrim
-# e.g. "5d" - 5 days. See man sleep.
-SLEEP_BEFORE_REPEAT="3h"
+# Time between periodic trim operations
+# Default is 4h, same as above
+SLEEP_BEFORE_REPEAT="4h"
 
-# Maximum CPU Load when fstrim is allowed.
-# If current CPU Load is above daemon sleeps for 5 min.
-# 1.0 means all cores are busy.
-MAX_CPU_LOAD="0.2"
+# Maximum average LA of a single core when trim will be performed
+# If LA is above this value, daemon will wait for 1 min until LA
+# drops down. LA of 1.0 means all cores are busy.
+MAX_LA="0.5"
 
-# integer [-20 .. 19 ] default 0
-# change the priority of the server -20 (high) to 19 (low)
-# see nice(1) for description
-NICE="19"
+# Divide sleep into sleep chunks (in seconds) in order to
+# prevent including system suspend/sleep time into sleep time and
+# performing trim just after system resume.
+SLEEP_CHUNK=1800
 
-# See start-stop-daemon(8) for possible settings
-# Modifies the IO scheduling priority of the daemon.  Class
-# can be 0 for none, 1 for real time, 2 for best effort and 3
-# for idle.  Data can be from 0 to 7 inclusive.
-IONICE="3"
+# Daemon preority integer in interval -20 (high) to 19 (low),
+# Default 0, see man nice for description
+NICE="0"
 
-# Here Daemon's process id will be stored
-PID="/var/run/fstrimDaemon.pid"
+# IO scheduling priority of the daemon.  Class  can be 0 for none,
+# 1 for real time, 2 for best effort and 3 for idle. Can be from 
+# 0 to 7 inclusive. See start-stop-daemon(8) for possible settings
+IONICE="0"
 
-# Here Daemon logs
-LOG="/var/log/fstrimeDaemon.log"
+# Daemon PID file
+PID="/var/run/trimd.pid"
 
-# The main daemon script i.e. fstrim-sleep loop
-DAEMON="/usr/sbin/fstrimDaemon.sh"
+# Daemon log. Leave empty for system default.
+#LOG="/var/log/trimd.log"
+
+# Main daemon script file
+DAEMON="/usr/sbin/trimd.sh"
 ```
 
 LOG
 -----------------------------------------
 
-See _/var/log/fstrimDaemon.log_
+See system log (i.e. /var/log/messages) or file defined by LOG variable in config.
 
 
 PROJECT HOME
 -----------------------------------------
 
-https://github.com/dobek/fstrimDaemon
+https://github.com/e-pirate/trimd
