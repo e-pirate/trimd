@@ -1,0 +1,9 @@
+[Unit]
+Description=Trim SSD on regular basis
+After=syslog.target
+
+[Service]
+ExecStart=/usr/sbin/trimd.sh
+
+[Install]
+WantedBy=multi-user.target
