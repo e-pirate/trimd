@@ -28,6 +28,7 @@ INSTALLATION
 ### To start daemon if you are using systemd:
 ```
 systemctl start trimd
+```
 
 ### To start daemon automatically at each boot if you are using systemd:
 ```
