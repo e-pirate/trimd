@@ -1,27 +1,37 @@
 #!/bin/bash
 
-echo Installing fstrimDaemon...
-
-DIR=`dirname $0`
-
-cp -fv usr/sbin/fstrimDaemon.sh /usr/sbin/fstrimDaemon.sh
-RES=$?
-if [ "$RES" != "0" ]; then
-	echo Must be root to install fstrimDaemon
-	exit $RES
-fi
-chmod 755 /usr/sbin/fstrimDaemon.sh
-
-if [ ! -e /etc/conf.d/fstrimDaemon ]; then
-	cp -v etc/conf.d/fstrimDaemon /etc/conf.d/fstrimDaemon
+if [ "$UID" -ne "0" ]; then
+    echo "error: You mast be root to run this script."
+    exit 77
 fi
 
-cp -fv etc/init.d/fstrimDaemon /etc/init.d/fstrimDaemon
-chmod 755 /etc/init.d/fstrimDaemon
+SYSTYPE="${1}"
 
-cp -fv usr/lib/systemd/system/fstrimDaemon.service /usr/lib/systemd/system/fstrimDaemon.service
-chmod 755 /usr/lib/systemd/system/fstrimDaemon.service
+if [[ ${SYSTYPE} != 'initd' && ${SYSTYPE} != 'systemd' ]]; then
+    echo "You mast specify system type as a script parameter:"
+    echo "$0 <initd|systemd>"
+    exit 64
+fi
 
-echo
-echo Find more information in README.md
-echo
+echo Installing trimd...
+
+INSTALL='/usr/bin/install -v -g root -o root'
+
+${INSTALL} -m 755 usr/sbin/trimd.sh /usr/sbin/
+
+if [ ! -e /etc/conf.d/trimd ]; then
+    ${INSTALL} -m 644 etc/conf.d/trimd /etc/conf.d/
+fi
+
+case ${SYSTYPE} in
+    initd)
+        ${INSTALL} -m 755 etc/init.d/trimd /etc/init.d/
+        echo "To start trimd run: /etc/init.d/trimd start"
+    ;;
+    systemd)
+        ${INSTALL} -m 755 usr/lib/systemd/system/trimd.service /usr/lib/systemd/system/trimd.service
+        echo "To start trimd run: systemctl daemon-reload && systemctl start trimd"
+    ;;
+esac
+
+echo "Find more information in README.md"
