@@ -17,7 +17,7 @@ INSTALLATION
 
 ### Run as root:
 ```
-./install.sh
+./install.sh <initd|systemd>
 ```
 
 ### To start daemon if you are using init.d:
