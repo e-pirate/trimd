@@ -15,21 +15,22 @@ fi
 
 echo Installing trimd...
 
+SRCDIR="$(dirname $0)"
 INSTALL='/usr/bin/install -v -g root -o root'
 
-${INSTALL} -m 755 usr/sbin/trimd.sh /usr/sbin/
+${INSTALL} -m 755 ${SRCDIR}/usr/sbin/trimd.sh /usr/sbin/
 
 if [ ! -e /etc/conf.d/trimd ]; then
-    ${INSTALL} -m 644 etc/conf.d/trimd /etc/conf.d/
+    ${INSTALL} -m 644 ${SRCDIR}/etc/conf.d/trimd /etc/conf.d/
 fi
 
 case ${SYSTYPE} in
     initd)
-        ${INSTALL} -m 755 etc/init.d/trimd /etc/init.d/
+        ${INSTALL} -m 755 ${SRCDIR}/etc/init.d/trimd /etc/init.d/
         echo "To start trimd run: /etc/init.d/trimd start"
     ;;
     systemd)
-        ${INSTALL} -m 755 usr/lib/systemd/system/trimd.service /usr/lib/systemd/system/trimd.service
+        ${INSTALL} -m 755 ${SRCDIR}/usr/lib/systemd/system/trimd.service /usr/lib/systemd/system/trimd.service
         echo "To start trimd run: systemctl daemon-reload && systemctl start trimd"
     ;;
 esac
