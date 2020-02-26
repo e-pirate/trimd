@@ -3,7 +3,7 @@ Description=Trim SSD on regular basis
 After=syslog.target
 
 [Service]
-ExecStart=/usr/sbin/trimd.sh
+ExecStart=/usr/sbin/trimd.sh -c _CFGPATH_
 
 [Install]
 WantedBy=multi-user.target

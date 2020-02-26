@@ -1,19 +1,17 @@
 #!/bin/bash
 
 FSTRIM="/sbin/fstrim"
-VERSION="0.3"
-
-source /etc/conf.d/trimd
+VERSION="0.4"
 
 cleanup()
 {
-        echo "Stopping trimd v$VERSION"
-        for JOB in $(jobs -p); do
-            [ $(< /proc/$JOB/comm) != 'fstrim' ] && kill $JOB                                           # avoid killing fstrim in progress
-        done
-        exit 0
+    echo "Stopping trimd v$VERSION"
+    for JOB in $(jobs -p); do
+        [ $(< /proc/$JOB/comm) != 'fstrim' ] && kill $JOB                                           # avoid killing fstrim in progress
+    done
+    exit 0
 }
-trap "cleanup" SIGTERM                                                                                  # SIGINT will kill all child processes itself
+trap "cleanup" SIGINT SIGTERM
 
 function fractional_sleep()
 {
@@ -31,6 +29,36 @@ function fractional_sleep()
     done
     sleep ${REMAINDER} & wait
 }
+
+OPTIND=1
+while getopts "h?c:" FLAG; do
+    case ${FLAG} in
+        c) CONFIG=${OPTARG};;
+        h|\?)
+            echo "Usage: $(basename $0) -c /path/to/trimd.conf"
+            exit 64
+        ;;
+    esac
+done
+shift $((OPTIND-1))
+[ "$1" = "--" ] && shift
+
+if [ -z ${CONFIG} ]; then
+    echo "$(basename $0): no mandatory configuration file specified"
+    echo "Try '$(basename $0) -h' for more information"
+    exit 64
+fi
+
+if [ ! -f ${CONFIG} ]; then
+    echo "$(basename $0): ${CONFIG}: No such file or directory"
+    exit 1
+fi
+
+source ${CONFIG}
+if [[ -z "${SLEEP_CHUNK}" || -z "${SLEEP_AT_START}" || -z "${SLEEP_BEFORE_REPEAT}" || -z "${MAX_LA}" ]]; then
+    echo "$(basename $0): Failed to load configuration, check ${CONFIG}"
+    exit 78
+fi
 
 echo "Strarting trimd v$VERSION"
 

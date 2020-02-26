@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ "$UID" -ne "0" ]; then
-    echo "error: You mast be root to run this script."
+    echo "Error: You mast be root to run this script."
     exit 77
 fi
 
@@ -13,24 +13,29 @@ if [[ ${SYSTYPE} != 'initd' && ${SYSTYPE} != 'systemd' ]]; then
     exit 64
 fi
 
-echo Installing trimd...
+echo "Installing trimd.."
 
 SRCDIR="$(dirname $0)"
 INSTALL='/usr/bin/install -v -g root -o root'
 
 ${INSTALL} -m 755 ${SRCDIR}/usr/sbin/trimd.sh /usr/sbin/
 
-if [ ! -e /etc/conf.d/trimd ]; then
-    ${INSTALL} -m 644 ${SRCDIR}/etc/conf.d/trimd /etc/conf.d/
+if [ -d /etc/conf.d ]; then
+    CONFIG='/etc/conf.d/trimd'
+else
+    CONFIG='/etc/trimd.conf'
 fi
+[ ! -e ${CONFIG} ] && ${INSTALL} -m 644 ${SRCDIR}/etc/trimd.conf ${CONFIG}
 
 case ${SYSTYPE} in
     initd)
         ${INSTALL} -m 755 ${SRCDIR}/etc/init.d/trimd /etc/init.d/
+        sed -i "s|_CFGPATH_|${CONFIG}|" /etc/init.d/trimd
         echo "To start trimd run: /etc/init.d/trimd start"
     ;;
     systemd)
         ${INSTALL} -m 755 ${SRCDIR}/usr/lib/systemd/system/trimd.service /usr/lib/systemd/system/trimd.service
+        sed -i "s|_CFGPATH_|${CONFIG}|" /usr/lib/systemd/system/trimd.service
         echo "To start trimd run: systemctl daemon-reload && systemctl start trimd"
     ;;
 esac
