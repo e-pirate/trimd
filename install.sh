@@ -22,6 +22,8 @@ ${INSTALL} -m 755 ${SRCDIR}/usr/sbin/trimd.sh /usr/sbin/
 
 if [ -d /etc/conf.d ]; then
     CONFIG='/etc/conf.d/trimd'
+else if [ -d /etc/sysconfig ]; then
+    CONFIG='/etc/sysconfig/trimd'
 else
     CONFIG='/etc/trimd.conf'
 fi

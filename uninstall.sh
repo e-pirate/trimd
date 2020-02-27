@@ -18,7 +18,7 @@ rm -fv /usr/sbin/trimd.sh
 [ -e /usr/lib/systemd/system/trimd.service ] && rm -fv /usr/lib/systemd/system/trimd.service
 
 echo You can manually remove:
-echo - /etc/conf.d/trimd or /etc/trimd.conf
+echo - /etc/{conf.d,sysconfig}/trimd or /etc/trimd.conf
 echo - /var/log/trimd.log if logging to file was used
 echo
 echo Find more information in README.md
