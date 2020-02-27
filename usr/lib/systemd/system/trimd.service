@@ -4,6 +4,7 @@ After=syslog.target
 
 [Service]
 ExecStart=/usr/sbin/trimd.sh -c _CFGPATH_
+KillMode=process
 
 [Install]
 WantedBy=multi-user.target
