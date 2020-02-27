@@ -34,7 +34,7 @@ case ${SYSTYPE} in
         echo "To start trimd run: /etc/init.d/trimd start"
     ;;
     systemd)
-        ${INSTALL} -m 755 ${SRCDIR}/usr/lib/systemd/system/trimd.service /usr/lib/systemd/system/trimd.service
+        ${INSTALL} -m 644 ${SRCDIR}/usr/lib/systemd/system/trimd.service /usr/lib/systemd/system/trimd.service
         sed -i "s|_CFGPATH_|${CONFIG}|" /usr/lib/systemd/system/trimd.service
         echo "To start trimd run: systemctl daemon-reload && systemctl start trimd"
     ;;
