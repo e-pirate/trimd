@@ -44,10 +44,9 @@ systemctl enable trimd
 ```
 ./uninstall.sh
 ```
-If you are using systemd, uninstall.sh will stop and disable the daemon
-
 Files which are not removed during uninstallation:
-- /etc/conf.d/trimd
+- config: /etc/{conf.d,sysconfig}/trimd /etc/trimd.conf
+- logs: /var/log/trimd.log if used
 
 
 CONFIGURATION
