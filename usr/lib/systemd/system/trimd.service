@@ -3,8 +3,10 @@ Description=Trim SSD on regular basis
 After=syslog.target
 
 [Service]
+EnvironmentFile=_CFGPATH_
 ExecStart=/usr/sbin/trimd.sh -c _CFGPATH_
 KillMode=process
+SyslogIdentifier=trimd
 
 [Install]
 WantedBy=multi-user.target
